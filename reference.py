@@ -2,31 +2,36 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
+from sklearn.datasets import load_boston
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression
 
 
 # ==============================================================================
-# Data
+# Data 
 # ==============================================================================
-#X,y
+dataset = load_boston()
+X, y = dataset.data, dataset.target
+# df = pd.read_csv("bank-additional-full.csv", sep=';')
+# X = df[df.columns[0:21]]
+# X=X.to_numpy()
+# y = df[df.columns[21:22]]
+# y=y.to_numpy()
+features = dataset.feature_names
+print(type(X))
+# ==============================================================================
+# CV MSE before feature selection
+# ==============================================================================
+est = LinearRegression()
+score = -1.0 * cross_val_score(est, X, y, cv=5, scoring="neg_mean_squared_error")
+print("CV MSE before feature selection: {:.2f}".format(np.mean(score)))
 
-
-# ==============================================================================
-# Fitness before feature selection
-# ==============================================================================
-svclassifier = SVC(kernel='linear')
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
-svclassifier.fit(X_train, y_train)
-y_pred = svclassifier.predict(X_test)
-ori_fitness = svclassifier.score(X_test,y_test)
 
 # ==============================================================================
 # Class performing feature selection with genetic algorithm
 # ==============================================================================
-
 class GeneticSelector():
     # sel = GeneticSelector(estimator=LinearRegression(),
     #                       n_gen=7, size=200, n_best=40, n_rand=40,
@@ -34,7 +39,7 @@ class GeneticSelector():
 
     def __init__(self, estimator, n_gen, size, n_best, n_rand,
                  n_children, mutation_rate):
-        # Estimator
+        # Estimator 
         self.estimator = estimator
         # Number of generations
         self.n_gen = n_gen
@@ -63,7 +68,6 @@ class GeneticSelector():
 
     def fitness(self, population):
         X, y = self.dataset
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
         scores = []
         for chromosome in population:
             score = -1.0 * np.mean(cross_val_score(self.estimator, X[:, chromosome], y,
@@ -135,7 +139,7 @@ class GeneticSelector():
 
     @property
     def support_(self):
-        return self.chromosomes_best[-1]
+        return self.chromosomes_best[0]
 
     def plot_scores(self):
         plt.scatter(np.arange(1,len(self.scores_best)+1,1),self.scores_best, label='Best')
@@ -144,3 +148,13 @@ class GeneticSelector():
         plt.ylabel('Scores')
         plt.xlabel('Generation')
         plt.show()
+
+
+sel = GeneticSelector(estimator=LinearRegression(),
+                      n_gen=20, size=200, n_best=40, n_rand=40,
+                      n_children=5, mutation_rate=0.05)
+sel.fit(X, y)
+
+score = -1.0 * cross_val_score(est, X[:, sel.support_], y, cv=5, scoring="neg_mean_squared_error")
+print("CV MSE after feature selection: {:.2f}".format(np.mean(score)))
+sel.plot_scores()
