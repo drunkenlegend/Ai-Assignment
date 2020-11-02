@@ -24,9 +24,9 @@ print(type(X))
 # ==============================================================================
 # CV MSE before feature selection
 # ==============================================================================
-est = LinearRegression()
-score = -1.0 * cross_val_score(est, X, y, cv=5, scoring="neg_mean_squared_error")
-print("CV MSE before feature selection: {:.2f}".format(np.mean(score)))
+# est = LinearRegression()
+# score = -1.0 * cross_val_score(est, X, y, cv=5, scoring="neg_mean_squared_error")
+# print("CV MSE before feature selection: {:.2f}".format(np.mean(score)))
 
 
 # ==============================================================================
@@ -150,11 +150,11 @@ class GeneticSelector():
         plt.show()
 
 
-sel = GeneticSelector(estimator=LinearRegression(),
-                      n_gen=20, size=200, n_best=40, n_rand=40,
-                      n_children=5, mutation_rate=0.05)
-sel.fit(X, y)
+# sel = GeneticSelector(estimator=LinearRegression(),
+#                       n_gen=20, size=200, n_best=40, n_rand=40,
+#                       n_children=5, mutation_rate=0.05)
+# sel.fit(X, y)
 
-score = -1.0 * cross_val_score(est, X[:, sel.support_], y, cv=5, scoring="neg_mean_squared_error")
-print("CV MSE after feature selection: {:.2f}".format(np.mean(score)))
-sel.plot_scores()
+# score = -1.0 * cross_val_score(est, X[:, sel.support_], y, cv=5, scoring="neg_mean_squared_error")
+# print("CV MSE after feature selection: {:.2f}".format(np.mean(score)))
+# sel.plot_scores()
