@@ -8,6 +8,7 @@ from matplotlib.backends.backend_gtk3agg import (
 	FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
 import numpy as np
+import animation
 
 global size, mutation_rate, crossover_rate
 size = 200
@@ -19,23 +20,23 @@ class MyWindow(Gtk.Window):
 		Gtk.Window.__init__(self, title="Emotion Recognition")
 
 		# Text Boxes
-		grid = Gtk.Grid()
-		grid.set_column_spacing(10)
-		grid.set_column_homogeneous(True)
-		self.add(grid)
-		# grid.attach(widget, column, row, colspan, rowspan)
+		self.grid = Gtk.Grid()
+		self.grid.set_column_spacing(10)
+		self.grid.set_column_homogeneous(True)
+		self.add(self.grid)
+		# self.grid.attach(widget, column, row, colspan, rowspan)
 
 		label1 = Gtk.Label()
 		label1.set_text("Population Size")
-		grid.attach(label1, 0, 1, 2, 1)
+		self.grid.attach(label1, 0, 1, 2, 1)
 
 		label2 = Gtk.Label()
 		label2.set_text("Crossover Chance")
-		grid.attach(label2, 0, 2, 2, 1)
+		self.grid.attach(label2, 0, 2, 2, 1)
 
 		label3 = Gtk.Label()
 		label3.set_text("Mutation Chance")
-		grid.attach(label3, 0, 3, 2, 1)
+		self.grid.attach(label3, 0, 3, 2, 1)
 
 		# Sliders
 
@@ -48,57 +49,62 @@ class MyWindow(Gtk.Window):
 		self.slide1 = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=ad1)
 		self.slide1.set_hexpand(True)
 		self.slide1.connect("value-changed", self.set_populationSize)
-		grid.attach(self.slide1, 2, 1, 2, 1)
+		self.grid.attach(self.slide1, 2, 1, 2, 1)
 
 		# Slider for Crossover Chance
 		self.slide2 = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=ad2)
 		self.slide2.set_hexpand(True)
 		self.slide2.connect("value-changed", self.set_crossoverChance)
-		grid.attach(self.slide2, 2, 2, 2, 1)
+		self.grid.attach(self.slide2, 2, 2, 2, 1)
 
 		# Slider for Mutation Chance
 		self.slide3 = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=ad3)
 		self.slide3.set_hexpand(True)
 		self.slide3.connect("value-changed", self.set_mutationChance)
-		grid.attach(self.slide3, 2, 3, 2, 1)
+		self.grid.attach(self.slide3, 2, 3, 2, 1)
 
-		f = Figure(figsize=(5, 4), dpi=100)
-		a = f.add_subplot(111)
-		t = np.arange(0.0, 3.0, 0.01)
-		s = np.tan(2*np.pi*t)
-		a.plot(t, s)
+		# f = Figure(figsize=(5, 4), dpi=100)
+		# a = f.add_subplot(111)
+		# self.canvas = None
+		# t = np.arange(0.0, 3.0, 0.01)
+		# s = np.tan(2*np.pi*t)
+		# a.plot(t, s)
 		
-
+		f = animation.ToCall()
 		self.canvas = FigureCanvas(f)  # a Gtk.DrawingArea
 		self.canvas.set_size_request(800, 600)
-		grid.attach(self.canvas, 4, 0, 4, 4)
+		self.grid.attach(self.canvas, 4, 0, 4, 4)
 
 		
 		button1 = Gtk.Button(label="Play")
 		button1.connect("clicked", self.play_clicked)
-		grid.attach(button1, 0, 0, 1, 1)
+		self.grid.attach(button1, 0, 0, 1, 1)
 
-		button2 = Gtk.Button(label="Pause")
-		button2.connect("clicked", self.pause_clicked)
-		grid.attach(button2, 1, 0, 1, 1)
+		button2 = Gtk.Button(label="Final")
+		button2.connect("clicked", self.final_clicked)
+		self.grid.attach(button2, 1, 0, 1, 1)
 
 		button3 = Gtk.Button(label="Clear and Reset")
 		button3.connect("clicked", self.reset_clicked)
-		grid.attach(button3, 2, 0, 1, 1)
+		self.grid.attach(button3, 2, 0, 1, 1)
 
 		button4 = Gtk.Button(label="DEFAULT CONFIG")
 		button4.connect("clicked", self.default_clicked)
-		grid.attach(button4, 3, 0, 1, 1)
+		self.grid.attach(button4, 3, 0, 1, 1)
 
 
 	def play_clicked(self, widget):
-		GeneticSelector(estimator=LinearRegression(),
-					  n_gen=20, size=size, n_best=40, n_rand=40,
-					  n_children=5, mutation_rate=mutation_rate, canvas=self.canvas)
+		f = animation.ToCall()
+		self.canvas = FigureCanvas(f)  # a Gtk.DrawingArea
+		self.canvas.set_size_request(800, 600)
+		self.grid.attach(self.canvas, 4, 0, 4, 4)
 		print("play")
 
-	def pause_clicked(self, widget):
-		print("pause")
+	def final_clicked(self, widget):
+		GeneticSelector(estimator=LinearRegression(),
+					  n_gen=20, size=size, n_best=40, n_rand=40,
+					  n_children=5, mutation_rate=mutation_rate)
+		print("final")
 
 	def reset_clicked(self, widget):
 		size = self.slide1.set_value(0)
@@ -123,7 +129,6 @@ class MyWindow(Gtk.Window):
 	def set_mutationChance(self, widget):
 		mutation_rate = round(self.slide3.get_value() / 100 , 3)
 		print(mutation_rate)
-
 
 win = MyWindow()
 win.connect("destroy", Gtk.main_quit)
