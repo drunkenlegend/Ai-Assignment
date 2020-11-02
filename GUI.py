@@ -10,6 +10,9 @@ from matplotlib.figure import Figure
 import numpy as np
 
 global size, mutation_rate, crossover_rate
+size = 200
+mutation_rate = 0.05
+crossover_rate = 0.05
 
 class MyWindow(Gtk.Window):
 	def __init__(self):
@@ -62,19 +65,15 @@ class MyWindow(Gtk.Window):
 		f = Figure(figsize=(5, 4), dpi=100)
 		a = f.add_subplot(111)
 		t = np.arange(0.0, 3.0, 0.01)
-		s = np.sin(2*np.pi*t)
+		s = np.tan(2*np.pi*t)
 		a.plot(t, s)
 		
 
-		canvas = FigureCanvas(f)  # a Gtk.DrawingArea
-		canvas.set_size_request(800, 600)
-		#sw.add_with_viewport(canvas)
-		grid.attach(canvas, 4, 0, 4, 4)
+		self.canvas = FigureCanvas(f)  # a Gtk.DrawingArea
+		self.canvas.set_size_request(800, 600)
+		grid.attach(self.canvas, 4, 0, 4, 4)
 
-
-		# self.box = Gtk.Box(spacing=3)
-		# self.add(self.box)
-
+		
 		button1 = Gtk.Button(label="Play")
 		button1.connect("clicked", self.play_clicked)
 		grid.attach(button1, 0, 0, 1, 1)
@@ -93,9 +92,9 @@ class MyWindow(Gtk.Window):
 
 
 	def play_clicked(self, widget):
-		#GeneticSelector = GeneticSelector(estimator=LinearRegression(),
-					  #n_gen=20, size, n_best=40, n_rand=40,
-					  #n_children=5, mutation_rate)
+		GeneticSelector(estimator=LinearRegression(),
+					  n_gen=20, size=size, n_best=40, n_rand=40,
+					  n_children=5, mutation_rate=mutation_rate, canvas=self.canvas)
 		print("play")
 
 	def pause_clicked(self, widget):
@@ -130,5 +129,3 @@ win = MyWindow()
 win.connect("destroy", Gtk.main_quit)
 win.show_all()
 Gtk.main()
-
-

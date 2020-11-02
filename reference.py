@@ -38,7 +38,7 @@ class GeneticSelector():
     #                       n_children=5, mutation_rate=0.05)
 
     def __init__(self, estimator, n_gen, size, n_best, n_rand,
-                 n_children, mutation_rate):
+                 n_children, mutation_rate, canvas):
         # Estimator 
         self.estimator = estimator
         # Number of generations
@@ -53,9 +53,13 @@ class GeneticSelector():
         self.n_children = n_children
         # Probablity of chromosome mutation
         self.mutation_rate = mutation_rate
+        # Gtk.Drawing Area for the graph plot
+        self.canvas = canvas
 
         if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
             raise ValueError("The population size is not stable.")
+
+        self.fit(X, y)
 
     def initilize(self):
         population = []
@@ -134,6 +138,8 @@ class GeneticSelector():
         population = self.initilize()
         for i in range(self.n_gen):
             population = self.generate(population)
+            print(i)
+            self.plot_scores
 
         return self
 
