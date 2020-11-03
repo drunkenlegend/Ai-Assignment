@@ -9,6 +9,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression
 from gi.repository import GObject
 import pickle
+import os
 
 # ==============================================================================
 # Data 
@@ -60,7 +61,7 @@ class GeneticSelector():
 		if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
 			raise ValueError("The population size is not stable.")
 
-		self.fit(X, y)
+		self.scores_best, self.scores_avg = self.fit(X, y)
 
 	def initilize(self):
 		population = []
@@ -141,13 +142,19 @@ class GeneticSelector():
 		for i in range(self.n_gen):
 			population = self.generate(population)
 			print(i)
+			listdump = [self.scores_best, self.scores_avg]
 
-			if i%2 == 0:
-				listdump = [self.scores_best, self.scores_avg]
+			pickle_out = open("plotreq.pickle","wb")
+			pickle.dump(listdump, pickle_out)
+			pickle_out.close()
 
-				pickle_out = open("plotreq.pickle","wb")
-				pickle.dump(listdump, pickle_out)
-				pickle_out.close()
+			# if i%2 == 0:
+			# 	listdump = [self.scores_best, self.scores_avg]
+
+			# 	pickle_out = open("plotreq.pickle","wb")
+			# 	pickle.dump(listdump, pickle_out)
+			# 	pickle_out.close()
+		return self.scores_best, self.scores_avg
 			#self.plot_scores
 
 		return self
@@ -157,18 +164,21 @@ class GeneticSelector():
 		return self.chromosomes_best[0]
 
 	def plot_scores(self):
-		plt.scatter(np.arange(1,len(self.scores_best)+1,1),self.scores_best, label='Best')
-		plt.plot(self.scores_avg, label='Average')
+		f = plt.figure()
+		ax = f.add_subplot(1, 1, 1)
+		ax.scatter(np.arange(1,len(self.scores_best)+1,1),self.scores_best, label='Best')
+		ax.plot(self.scores_avg, label='Average')
 		plt.legend()
 		plt.ylabel('Scores')
 		plt.xlabel('Generation')
-		plt.show()
+		return f
+		#plt.show()
 
 
 # sel = GeneticSelector(estimator=LinearRegression(),
-# 						n_gen=20, size=200, n_best=40, n_rand=40,
+# 						n_gen=100, size=200, n_best=40, n_rand=40,
 # 						n_children=5, mutation_rate=0.05)
-# sel.fit(X, y)
+
 
 # score = -1.0 * cross_val_score(est, X[:, sel.support_], y, cv=5, scoring="neg_mean_squared_error")
 # print("CV MSE after feature selection: {:.2f}".format(np.mean(score)))

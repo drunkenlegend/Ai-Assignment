@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import gi
+import os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from reference import GeneticSelector
@@ -8,7 +9,9 @@ from matplotlib.backends.backend_gtk3agg import (
 	FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
 import numpy as np
-import animation
+import matplotlib.pyplot as plt
+import threading
+#import animation
 
 global size, mutation_rate, crossover_rate
 size = 200
@@ -70,8 +73,8 @@ class MyWindow(Gtk.Window):
 		# s = np.tan(2*np.pi*t)
 		# a.plot(t, s)
 		
-		f = animation.ToCall()
-		self.canvas = FigureCanvas(f)  # a Gtk.DrawingArea
+		self.f = Figure(figsize=(5, 4), dpi=100)
+		self.canvas = FigureCanvas(self.f)  # a Gtk.DrawingArea
 		self.canvas.set_size_request(800, 600)
 		self.grid.attach(self.canvas, 4, 0, 4, 4)
 
@@ -94,16 +97,35 @@ class MyWindow(Gtk.Window):
 
 
 	def play_clicked(self, widget):
-		f = animation.ToCall()
+
+		self.grid.remove(self.canvas)
+		f = Figure()
+		ax = f.add_subplot(111)
+
+		ax.scatter(np.arange(1,len(self.gensel.scores_best)+1,1),self.gensel.scores_best, label='Best')
+		ax.plot(np.arange(1,len(self.gensel.scores_best)+1,1), self.gensel.scores_avg, label='Average')
+
 		self.canvas = FigureCanvas(f)  # a Gtk.DrawingArea
 		self.canvas.set_size_request(800, 600)
 		self.grid.attach(self.canvas, 4, 0, 4, 4)
+
+		self.show_all()
 		print("play")
 
 	def final_clicked(self, widget):
-		GeneticSelector(estimator=LinearRegression(),
+		def CallGA():
+			self.gensel = GeneticSelector(estimator=LinearRegression(),
 					  n_gen=20, size=size, n_best=40, n_rand=40,
 					  n_children=5, mutation_rate=mutation_rate)
+		def RealTimePlot():
+			os.system("python3 animation.py")
+
+		t1 = threading.Thread(target=CallGA)
+		t2 = threading.Thread(target=RealTimePlot)
+
+		t1.start()
+		t2.start()
+
 		print("final")
 
 	def reset_clicked(self, widget):
@@ -129,6 +151,11 @@ class MyWindow(Gtk.Window):
 	def set_mutationChance(self, widget):
 		mutation_rate = round(self.slide3.get_value() / 100 , 3)
 		print(mutation_rate)
+
+# class RealtimePlot(Thread):
+# 	def run(self):
+# 		os.system("python3 animation.py")
+
 
 win = MyWindow()
 win.connect("destroy", Gtk.main_quit)

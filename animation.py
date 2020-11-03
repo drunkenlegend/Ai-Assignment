@@ -4,14 +4,20 @@ import pickle
 from matplotlib.backends.backend_gtk3agg import (
 	FigureCanvasGTK3Agg as FigureCanvas)
 
-def ToCall():
-	# Create figure for plotting
-	fig = plt.figure()
-	ax = fig.add_subplot(1, 1, 1)
-	xs = []
-	ys = []
-	# This function is called periodically from FuncAnimation
-	def animate(i, xs, ys):
+
+# Create figure for plotting
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+xs = []
+ys = []
+listdump = [[], []]
+
+pickle_out = open("plotreq.pickle","wb")
+pickle.dump(listdump, pickle_out)
+pickle_out.close()
+	
+# This function is called periodically from FuncAnimation
+def animate(i, xs, ys):
 
 		pickle_in = open("plotreq.pickle","rb")
 		example_dict = pickle.load(pickle_in)
@@ -40,7 +46,5 @@ def ToCall():
 		#grid.attach(canvas, 4, 0, 4, 4)
 		print("Hi")
 
-	ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=250)
-	plt.show(block=False)
-	return fig
-	#plt.show()
+ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=500)
+plt.show()
