@@ -45,7 +45,7 @@ class GeneticSelector():
     #                       n_children=5, mutation_rate=0.05)
 
     def __init__(self, estimator, n_gen, size, n_best, n_rand,
-                 n_children, mutation_rate):
+                 n_children, mutation_rate, xover):
         # Estimator
         self.estimator = estimator
         # Number of generations
@@ -60,6 +60,8 @@ class GeneticSelector():
         self.n_children = n_children
         # Probablity of chromosome mutation
         self.mutation_rate = mutation_rate
+        # Crossover Function
+        self.xover=xover
 
         if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
             raise ValueError("The population size is not stable.")
@@ -111,11 +113,12 @@ class GeneticSelector():
 
     def onepoint_crossover(self, population):
         population_next = []
-        for i in range(20):
+        nbest=int(0.2*self.size)
+        for i in range(nbest):
             population_next.append(population[i])
-        for i in range(int(len(population) / 2)):
+        for i in range(nbest,int(len(population)),2):
 
-            chromosome1, chromosome2 = population[i], population[len(population) - 1 - i]
+            chromosome1, chromosome2 = population[i], population[i+1]
             child=chromosome1
             child[int(len(chromosome1)/2):] = chromosome2[int(len(chromosome1)/2):]
             child2 = chromosome2
@@ -128,17 +131,26 @@ class GeneticSelector():
         #print(len(population_next))
         return population_next
 
+
     def twopoint_crossover(self, population):
         population_next = []
-        for i in range(int(len(population) / 2)):
-            for j in range(self.n_children):
-                chromosome1, chromosome2 = population[i], population[len(population) - 1 - i]
-                l=int(len(chromosome1)/3)
-                child=chromosome1
-                child[l:2*l] = chromosome2[l:2*l]
-                child[2*l:] = chromosome1[2*l:]
+        nbest = int(0.2 * self.size)
+        for i in range(nbest):
+            population_next.append(population[i])
+        for i in range(nbest, int(len(population)), 2):
+            chromosome1, chromosome2 = population[i], population[i + 1]
+            l = int(len(chromosome1) / 3)
 
-                population_next.append(child)
+            child = chromosome1
+            child[l:2 * l] = chromosome2[l:2 * l]
+            child[2 * l:] = chromosome1[2 * l:]
+
+            child2 = chromosome2
+            child2[l:2 * l] = chromosome1[l:2 * l]
+            child2[2 * l:] = chromosome2[2 * l:]
+
+            population_next.append(child)
+            population_next.append(child2)
 
         # print(len(population_next))
         return population_next
@@ -154,11 +166,23 @@ class GeneticSelector():
         return population_next
 
     def generate(self, population):
+
         # Selection, crossover and mutation
-        scores_sorted, population_sorted = self.fitness(population)
-        population = self.select(population_sorted)
-        population = self.uniform_crossover(population)
-        population = self.mutate(population)
+
+        if(self.xover==1):  #for onepoint crossover
+            scores_sorted, population_sorted = self.fitness(population)
+            population = self.onepoint_crossover(population_sorted)
+            population = self.mutate(population)
+        elif(self.xover==2): # for twopoint crossover
+            scores_sorted, population_sorted = self.fitness(population)
+            population = self.twopoint_crossover(population_sorted)
+            population = self.mutate(population)
+        else:   #for uniform crossover
+            scores_sorted, population_sorted = self.fitness(population)
+            population = self.select(population_sorted)
+            population = self.uniform_crossover(population)
+            population = self.mutate(population)
+
         # History
         self.chromosomes_best.append(population_sorted[0])
         self.scores_best.append(scores_sorted[0])
@@ -185,7 +209,7 @@ class GeneticSelector():
         return self.chromosomes_best[-1]
 
     def plot_scores(self):
-        plt.scatter(np.arange(1,len(self.scores_best)+1,1),self.scores_best, label='Best')
+        plt.plot(self.scores_best, label='Best')
         plt.plot(self.scores_avg, label='Average')
         plt.legend()
         plt.ylabel('Error')
@@ -193,8 +217,8 @@ class GeneticSelector():
         plt.show()
 
 sel = GeneticSelector(estimator=clf,
-                      n_gen=80, size=200, n_best=40, n_rand=40,
-                      n_children=5, mutation_rate=0.05)
+                      n_gen=20, size=200, n_best=40, n_rand=40,
+                      n_children=5, mutation_rate=0.05,xover=5)
 sel.fit(X, y)
 
 score = cross_val_score(clf, X[:, sel.support_],np.array(y.reshape(-1,)), cv=5)
