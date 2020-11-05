@@ -90,7 +90,7 @@ class GeneticSelector():
 			population_next.append(population_sorted[i])
 		for i in range(self.n_rand):
 			population_next.append(random.choice(population_sorted))
-		#random.shuffle(population_next)
+		random.shuffle(population_next)
 		return population_next
 
 	def crossover(self, population):
@@ -147,13 +147,6 @@ class GeneticSelector():
 			pickle_out = open("plotreq.pickle","wb")
 			pickle.dump(listdump, pickle_out)
 			pickle_out.close()
-
-			# if i%2 == 0:
-			# 	listdump = [self.scores_best, self.scores_avg]
-
-			# 	pickle_out = open("plotreq.pickle","wb")
-			# 	pickle.dump(listdump, pickle_out)
-			# 	pickle_out.close()
 		return self.scores_best, self.scores_avg
 			#self.plot_scores
 

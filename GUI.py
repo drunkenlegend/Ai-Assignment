@@ -96,7 +96,7 @@ class MyWindow(Gtk.Window):
 		self.grid.attach(button4, 3, 0, 1, 1)
 
 
-	def play_clicked(self, widget):
+	def final_clicked(self, widget):
 
 		self.grid.remove(self.canvas)
 		f = Figure()
@@ -112,10 +112,10 @@ class MyWindow(Gtk.Window):
 		self.show_all()
 		print("play")
 
-	def final_clicked(self, widget):
+	def play_clicked(self, widget):
 		def CallGA():
 			self.gensel = GeneticSelector(estimator=LinearRegression(),
-					  n_gen=20, size=size, n_best=40, n_rand=40,
+					  n_gen=80, size=size, n_best=40, n_rand=40,
 					  n_children=5, mutation_rate=mutation_rate)
 		def RealTimePlot():
 			os.system("python3 animation.py")
@@ -125,8 +125,6 @@ class MyWindow(Gtk.Window):
 
 		t1.start()
 		t2.start()
-
-		print("final")
 
 	def reset_clicked(self, widget):
 		size = self.slide1.set_value(0)
