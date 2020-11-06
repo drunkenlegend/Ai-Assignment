@@ -44,7 +44,7 @@ class GeneticSelector():
     #                       n_children=5, mutation_rate=0.05, xover)
 
     def __init__(self, n_gen, size, n_best, n_rand,
-                 n_children, mutation_rate, counter, xover):
+                 n_children, mutation_rate, counter, xover, mut):
         # Estimator
         # self.estimator = estimator
         # Number of generations
@@ -62,7 +62,9 @@ class GeneticSelector():
         # counter to select the ML model/fitness function
         self.counter = counter
         # Crossover Function
-        self.xover=xover
+        self.xover = xover
+        # To select mutation type
+        self.mut = mut
 
         if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
             raise ValueError("The population size is not stable.")
@@ -257,19 +259,22 @@ class GeneticSelector():
 
     def generate(self, population):
         # Selection, crossover and mutation
+        scores_sorted, population_sorted = self.fitness(population)
+        population = self.select(population_sorted)
+
         if(self.xover==1):  #for onepoint crossover
-            scores_sorted, population_sorted = self.fitness(population)
             population = self.onepoint_crossover(population_sorted)
-            population = self.mutate(population)
         elif(self.xover==2): # for twopoint crossover
-            scores_sorted, population_sorted = self.fitness(population)
             population = self.twopoint_crossover(population_sorted)
-            population = self.mutate(population)
-        else:   #for uniform crossover
-            scores_sorted, population_sorted = self.fitness(population)
-            population = self.select(population_sorted)
+        elif(self.xover==5):   #for uniform crossover
             population = self.uniform_crossover(population)
+
+        if(self.mut==0):
             population = self.mutate(population)
+        elif(self.mut==1):
+            population = self.swap_mutate(population)
+        elif(self.mut==2):
+            population = self.scramble(population)
 
         # History
         self.chromosomes_best.append(population_sorted[0])
@@ -296,7 +301,6 @@ class GeneticSelector():
         print("Accuracy before feature selection: {:.2f}".format(np.mean(self.score_before)))
         for i in range(self.n_gen):
             population = self.generate(population)
-            print(i)
             listdump = [self.scores_best, self.scores_avg]
 
             pickle_out = open("plotreq.pickle","wb")
@@ -317,10 +321,8 @@ class GeneticSelector():
     #     plt.xlabel('Generation')
     #     plt.show()
 
-# sel = GeneticSelector(estimator=clf,
-#                       n_gen=20, size=200, n_best=40, n_rand=40,
-#                       n_children=5, mutation_rate=0.05, counter=0, xover=5)
-# sel.fit(X, y)
+# sel = GeneticSelector(n_gen=20, size=200, n_best=40, n_rand=40,
+                        # n_children=5, mutation_rate=0.05, counter=1, xover=5, mut=0)
 # sel.plot_scores()
 
 

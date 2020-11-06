@@ -44,7 +44,6 @@ def animate(i, xs, ys):
 		#canvas.blit(ax.bbox)
 		#canvas.draw()
 		#grid.attach(canvas, 4, 0, 4, 4)
-		print("Hi")
 
 ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=500)
 plt.show()
