@@ -4,7 +4,7 @@ import os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from GAclass import GeneticSelector
-from sklearn.linear_model import LinearRegression
+# from sklearn.linear_model import LinearRegression
 from matplotlib.backends.backend_gtk3agg import (
 	FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
@@ -114,9 +114,9 @@ class MyWindow(Gtk.Window):
 
 	def play_clicked(self, widget):
 		def CallGA():
-			self.gensel = GeneticSelector(estimator=LinearRegression(),
-					  n_gen=80, size=size, n_best=40, n_rand=40,
-					  n_children=5, mutation_rate=mutation_rate)
+			self.gensel = GeneticSelector(n_gen=20, size=size, n_best=40, n_rand=40,
+                                          n_children=5, mutation_rate=mutation_rate, counter=1, xover=5)
+
 		def RealTimePlot():
 			os.system("python3 animation.py")
 

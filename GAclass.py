@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from keras import Sequential
 from keras.layers import Dense
+import pickle
 
 # ==============================================================================
 # Data
@@ -42,10 +43,10 @@ class GeneticSelector():
     #                       n_gen=7, size=200, n_best=40, n_rand=40,
     #                       n_children=5, mutation_rate=0.05, xover)
 
-    def __init__(self, estimator, n_gen, size, n_best, n_rand,
+    def __init__(self, n_gen, size, n_best, n_rand,
                  n_children, mutation_rate, counter, xover):
         # Estimator
-        self.estimator = estimator
+        # self.estimator = estimator
         # Number of generations
         self.n_gen = n_gen
         # Number of chromosomes in population
@@ -65,6 +66,8 @@ class GeneticSelector():
 
         if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
             raise ValueError("The population size is not stable.")
+
+        self.scores_best, self.scores_avg = self.fit(X, y)
 
     def initilize(self):
         population = []
@@ -293,25 +296,35 @@ class GeneticSelector():
         print("Accuracy before feature selection: {:.2f}".format(np.mean(self.score_before)))
         for i in range(self.n_gen):
             population = self.generate(population)
+            print(i)
+            listdump = [self.scores_best, self.scores_avg]
 
-        return self
+            pickle_out = open("plotreq.pickle","wb")
+            pickle.dump(listdump, pickle_out)
+            pickle_out.close()
+
+        return self.scores_best, self.scores_avg
 
     @property
     def support_(self):
-        return self.chromosomes_best[-1]
+        return self.chromosomes_best[0]
 
-    def plot_scores(self):
-        plt.plot(self.scores_best, label='Best')
-        plt.plot(self.scores_avg, label='Average')
-        plt.legend()
-        plt.ylabel('Error')
-        plt.xlabel('Generation')
-        plt.show()
+    # def plot_scores(self):
+    #     plt.plot(self.scores_best, label='Best')
+    #     plt.plot(self.scores_avg, label='Average')
+    #     plt.legend()
+    #     plt.ylabel('Error')
+    #     plt.xlabel('Generation')
+    #     plt.show()
 
-sel = GeneticSelector(estimator=clf,
-                      n_gen=20, size=200, n_best=40, n_rand=40,
-                      n_children=5, mutation_rate=0.05, counter=0, xover=5)
-sel.fit(X, y)
-score = cross_val_score(clf, X[:, sel.support_],np.array(y.reshape(-1,)), cv=5)
-print("Accuracy after feature selection: {:.2f}".format(np.mean(score)))
-sel.plot_scores()
+# sel = GeneticSelector(estimator=clf,
+#                       n_gen=20, size=200, n_best=40, n_rand=40,
+#                       n_children=5, mutation_rate=0.05, counter=0, xover=5)
+# sel.fit(X, y)
+# sel.plot_scores()
+
+
+# uncomment later-------------------
+# score = cross_val_score(clf, X[:, sel.support_],np.array(y.reshape(-1,)), cv=5)
+# print("Accuracy after feature selection: {:.2f}".format(np.mean(score)))
+# -----------------------------------------
