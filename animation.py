@@ -39,11 +39,5 @@ def animate(i, xs, ys):
 		plt.ylabel('Scores')
 		plt.xlabel('Generation')
 
-		# canvas = FigureCanvas(fig)
-		# canvas.set_size_request(800, 600)
-		#canvas.blit(ax.bbox)
-		#canvas.draw()
-		#grid.attach(canvas, 4, 0, 4, 4)
-
 ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=500)
 plt.show()

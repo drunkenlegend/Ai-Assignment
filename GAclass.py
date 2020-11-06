@@ -5,7 +5,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
-#from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from keras import Sequential
@@ -31,7 +30,6 @@ y = y.to_numpy().reshape(425, )
 # ==============================================================================
 est = RandomForestClassifier(n_estimators=100)
 clf = svm.SVC(kernel='linear', C=1)
-# score_before =  cross_val_score(clf, X,np.array(y.reshape(-1,)), cv=2)
 
 
 # ==============================================================================
@@ -39,14 +37,9 @@ clf = svm.SVC(kernel='linear', C=1)
 # ==============================================================================
 
 class GeneticSelector():
-    # sel = GeneticSelector(estimator=LinearRegression(),
-    #                       n_gen=7, size=200, n_best=40, n_rand=40,
-    #                       n_children=5, mutation_rate=0.05, xover)
 
     def __init__(self, n_gen, size, n_best, n_rand,
                  n_children, mutation_rate, counter, xover, mut):
-        # Estimator
-        # self.estimator = estimator
         # Number of generations
         self.n_gen = n_gen
         # Number of chromosomes in population
@@ -166,7 +159,6 @@ class GeneticSelector():
                 child[mask] = chromosome2[mask]
                 population_next.append(child)
 
-        #print(len(population_next))
         return population_next
 
     def onepoint_crossover(self, population):
@@ -185,8 +177,6 @@ class GeneticSelector():
             population_next.append(child)
             population_next.append(child2)
 
-
-        #print(len(population_next))
         return population_next
 
     def twopoint_crossover(self, population):
@@ -208,7 +198,7 @@ class GeneticSelector():
 
             population_next.append(child)
             population_next.append(child2)
-        # print(len(population_next))
+
         return population_next
 
     def mutate(self, population):
@@ -220,8 +210,7 @@ class GeneticSelector():
                 chromosome[mask] = False
             population_next.append(chromosome)
         return population_next
-
-    #Expects a single gene to be parsed to the function (1-D numpy array)    
+   
     def scramble(self, population):
         population_next = []
         for gene in population:
@@ -239,7 +228,6 @@ class GeneticSelector():
           gene_scram = gene_copy
           population_next.append(gene_scram[0])
         
-        ##NOTE : Might return same gene if the random int generated are consecutive.
         return population_next
 
     def swap_mutate(self, population):
@@ -294,9 +282,9 @@ class GeneticSelector():
         population = self.initilize()
         if self.counter==0:
              self.score_before = self.NN(np.ones(8, dtype=bool))
-        elif self.counter==1: #SVM
+        elif self.counter==1: # SVM
              self.score_before = cross_val_score(clf, X[:, :],np.array(y.reshape(-1,)), cv=5)
-        else: #Logistic Regression
+        else: # RF
              self.score_before = cross_val_score(est, X[:, :],np.array(y.reshape(-1,)), cv=5)
         print("Accuracy before feature selection: {:.2f}".format(np.mean(self.score_before)))
         for i in range(self.n_gen):
@@ -306,10 +294,6 @@ class GeneticSelector():
             pickle_out = open("plotreq.pickle","wb")
             pickle.dump(listdump, pickle_out)
             pickle_out.close()
-
-        # print("Accuracy after feature selection: {:.2f}".format(self.scores_best[0]))
-        # print("Feature Subset: ")
-        # print(self.chromosomes_best[0])
 
         return self.scores_best, self.scores_avg
 

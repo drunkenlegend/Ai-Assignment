@@ -4,14 +4,12 @@ import os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from GAclass import GeneticSelector
-# from sklearn.linear_model import LinearRegression
 from matplotlib.backends.backend_gtk3agg import (
 	FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.pyplot as plt
 import threading
-#import animation
 
 global size, mutation_rate, counter, xover, mut, n_gen
 n_gen = 20
