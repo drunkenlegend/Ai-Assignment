@@ -307,6 +307,10 @@ class GeneticSelector():
             pickle.dump(listdump, pickle_out)
             pickle_out.close()
 
+        # print("Accuracy after feature selection: {:.2f}".format(self.scores_best[0]))
+        # print("Feature Subset: ")
+        # print(self.chromosomes_best[0])
+
         return self.scores_best, self.scores_avg
 
     @property
@@ -322,9 +326,7 @@ class GeneticSelector():
     #     plt.show()
 
 # sel = GeneticSelector(n_gen=20, size=200, n_best=40, n_rand=40,
-                        # n_children=5, mutation_rate=0.05, counter=1, xover=5, mut=0)
-# sel.plot_scores()
-
+#                         n_children=5, mutation_rate=0.05, counter=1, xover=5, mut=0)
 
 # uncomment later-------------------
 # score = cross_val_score(clf, X[:, sel.support_],np.array(y.reshape(-1,)), cv=5)

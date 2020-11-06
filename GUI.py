@@ -171,8 +171,15 @@ class MyWindow(Gtk.Window):
 		self.canvas.set_size_request(800, 600)
 		self.grid.attach(self.canvas, 4, 0, 4, 4)
 
+		label7 = Gtk.Label()
+		label7.set_text("Accuracy after feature selection: {0}".format(self.gensel.scores_best[0]))
+		self.grid.attach(label7, 4, 4, 4, 1)
+
+		label8 = Gtk.Label()
+		label8.set_text("Feature Subset selected: {0}".format(self.gensel.chromosomes_best[0]))
+		self.grid.attach(label8, 4, 5, 4, 1)
+
 		self.show_all()
-		print("play")
 
 	def play_clicked(self, widget):
 		def CallGA():
@@ -242,11 +249,6 @@ class MyWindow(Gtk.Window):
 				counter = 1
 			elif label == "RF":
 				counter = 2
-
-# class RealtimePlot(Thread):
-# 	def run(self):
-# 		os.system("python3 animation.py")
-
 
 win = MyWindow()
 win.connect("destroy", Gtk.main_quit)
