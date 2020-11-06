@@ -11,16 +11,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import threading
 
-global size, mutation_rate, counter, xover, mut, n_gen
-n_gen = 20
-size = 200
-counter = 1
-mutation_rate = 0.05
-mut = 0
-xover = 5
-
 class MyWindow(Gtk.Window):
 	def __init__(self):
+
+		self.n_gen = 20
+		self.size = 200
+		self.counter = 1
+		self.mutation_rate = 0.05
+		self.mut = 0
+		self.xover = 5
+
 		Gtk.Window.__init__(self, title="Emotion Recognition")
 
 		# Text Boxes
@@ -181,8 +181,9 @@ class MyWindow(Gtk.Window):
 
 	def play_clicked(self, widget):
 		def CallGA():
-			self.gensel = GeneticSelector(n_gen=n_gen, size=size, n_best=40, n_rand=40,
-										  n_children=5, mutation_rate=mutation_rate, counter=counter, xover=xover, mut=mut)
+			print(self.n_gen, self.size, self.mutation_rate, self.counter, self.xover, self.mut)
+			self.gensel = GeneticSelector(n_gen=self.n_gen, size=self.size, n_best=40, n_rand=40,
+										  n_children=5, mutation_rate=self.mutation_rate, counter=self.counter, xover=self.xover, mut=self.mut)
 
 		def RealTimePlot():
 			os.system("python3 animation.py")
@@ -194,59 +195,59 @@ class MyWindow(Gtk.Window):
 		t2.start()
 
 	def reset_clicked(self, widget):
-		size = self.slide1.set_value(0)
-		crossover_rate = self.slide2.set_value(0)
-		mutation_rate = self.slide3.set_value(0)
-		print(crossover_rate)
+		self.size = self.slide1.set_value(0)
+		self.crossover_rate = self.slide2.set_value(0)
+		self.mutation_rate = self.slide3.set_value(0)
+		print(self.crossover_rate)
 
 	def default_clicked(self, widget):
-		size = self.slide1.set_value(200)
-		crossover_rate = self.slide2.set_value(5)
-		mutation_rate = self.slide3.set_value(5)
-		print(crossover_rate)
+		self.size = self.slide1.set_value(200)
+		self.crossover_rate = self.slide2.set_value(5)
+		self.mutation_rate = self.slide3.set_value(5)
+		print(self.crossover_rate)
 
 	def set_populationSize(self, widget):
-		size = int(self.slide1.get_value())
-		print(size)
+		self.size = int(self.slide1.get_value())
+		print(self.size)
 
 	def set_mutationChance(self, widget):
-		mutation_rate = round(self.slide2.get_value() / 100 , 3)
-		print(mutation_rate)
+		self.mutation_rate = round(self.slide2.get_value() / 100 , 3)
+		print(self.mutation_rate)
 
 	def set_nGen(self, widget):
-		n_gen = int(self.slide3.get_value())
-		print(n_gen)
+		self.n_gen = int(self.slide3.get_value())
+		print(self.n_gen)
 
 	def toggled_cb_mutate(self, button):
 		if button.get_active():
 			label = button.get_label()
 			if label == "Random Mutation":
-				mut = 0
+				self.mut = 0
 			elif label == "Swap Mutate":
-				mut = 1
+				self.mut = 1
 			elif label == "Scramble Mutate":
-				mut = 2
+				self.mut = 2
 
 
 	def toggled_cb_crossover(self, button):
 		if button.get_active():
 			label = button.get_label()
 			if label == "Uniform Crossover":
-				xover = 5
+				self.xover = 5
 			elif label == "One-point Crossover":
-				xover = 1
+				self.xover = 1
 			elif label == "Two-point Crossover":
-				xover = 2
+				self.xover = 2
 
 	def toggled_cb_fitness(self, button):
 		if button.get_active():
 			label = button.get_label()
 			if label == "NN":
-				counter = 0
+				self.counter = 0
 			elif label == "SVM":
-				counter = 1
+				self.counter = 1
 			elif label == "RF":
-				counter = 2
+				self.counter = 2
 
 win = MyWindow()
 win.connect("destroy", Gtk.main_quit)

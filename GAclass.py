@@ -59,8 +59,8 @@ class GeneticSelector():
         # To select mutation type
         self.mut = mut
 
-        if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
-            raise ValueError("The population size is not stable.")
+        # if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
+        #     raise ValueError("The population size is not stable.")
 
         self.scores_best, self.scores_avg = self.fit(X, y)
 
@@ -142,6 +142,8 @@ class GeneticSelector():
 
     def select(self, population_sorted):
         population_next = []
+        self.n_best = int(self.size / self.n_children)
+        self.n_rand = self.size - (self.n_best * self.n_children)
         for i in range(self.n_best):
             population_next.append(population_sorted[i])
         for i in range(self.n_rand):
