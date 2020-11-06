@@ -17,13 +17,18 @@ import pickle
 #X,y
 
 df=pd.read_excel('surprise_and_others.xlsx')
-#df.drop(['frame', ' confidence'], axis = 1, inplace = True)
+
+#data for svm and rf
+X_ex = df[df.columns[2:10]]
+y_ex = df[df.columns[10:11]]
+X_ex = X_ex.to_numpy()
+y_ex = y_ex.to_numpy().reshape(425, )
+
+df.drop(['frame', ' confidence'], axis = 1, inplace = True)
 X = df[df.columns[2:10]]
 y = df[df.columns[10:11]]
 X_train = X.to_numpy()
 Y_train = y.to_numpy()
-X = X.to_numpy()
-y = y.to_numpy().reshape(425, )
 
 # ==============================================================================
 # Fitness before feature selection
@@ -128,11 +133,11 @@ class GeneticSelector():
                 score = self.NN(chromosome)
                 
             elif self.counter==1:
-                score =  np.mean(cross_val_score(clf, X[:, chromosome], y,
+                score =  np.mean(cross_val_score(clf, X_ex[:, chromosome], y_ex,
                                                    cv=2
                                                   ))
             else:
-                score =  np.mean(cross_val_score(est, X[:, chromosome], y,
+                score =  np.mean(cross_val_score(est, X_ex[:, chromosome], y_ex,
                                                    cv=2
                                                   ))
             scores.append(score)
@@ -279,16 +284,20 @@ class GeneticSelector():
         self.scores_best, self.scores_avg = [], []
 
         self.dataset = X, y
-        self.n_features = X.shape[1]
 
-        population = self.initilize()
+
+
         if self.counter==0:
+             self.n_features = X.shape[1]
              self.score_before = self.NN(np.ones(8, dtype=bool))
         elif self.counter==1: # SVM
-             self.score_before = cross_val_score(clf, X[:, :],np.array(y.reshape(-1,)), cv=5)
+             self.n_features = X_ex.shape[1]
+             self.score_before = cross_val_score(clf, X_ex[:, :],np.array(y_ex.reshape(-1,)), cv=5)
         else: # RF
-             self.score_before = cross_val_score(est, X[:, :],np.array(y.reshape(-1,)), cv=5)
+             self.n_features = X_ex.shape[1]
+             self.score_before = cross_val_score(est, X_ex[:, :],np.array(y_ex.reshape(-1,)), cv=5)
         print("Accuracy before feature selection: {:.2f}".format(np.mean(self.score_before)))
+        population = self.initilize()
         for i in range(self.n_gen):
             population = self.generate(population)
             listdump = [self.scores_best, self.scores_avg]
